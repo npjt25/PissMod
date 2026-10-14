@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "pissmod-gametest",
+	"version": "1.0.0",
+	"name": "PissMod Game Tests",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"com.npjt25.pissmod.gametest.PissModClientGameTest"
+		]
+	},
+	"depends": {
+		"pissmod": "*"
+	}
+}

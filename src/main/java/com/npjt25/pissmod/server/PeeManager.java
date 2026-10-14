@@ -127,6 +127,11 @@ public final class PeeManager {
 		}
 	}
 
+	public static PeePhase phaseOf(ServerPlayer player) {
+		State state = STATES.get(player.getUUID());
+		return state == null ? PeePhase.IDLE : state.phase;
+	}
+
 	public static void reset(ServerPlayer player) {
 		State state = STATES.remove(player.getUUID());
 

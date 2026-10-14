@@ -29,6 +29,10 @@ public class PissModClient implements ClientModInitializer {
 	private static int sentColor = -1;
 	private static boolean warnedMissingServer;
 
+	public static KeyMapping peeKey() {
+		return peeKey;
+	}
+
 	@Override
 	public void onInitializeClient() {
 		KeyMapping.Category category = KeyMapping.Category.register(PissMod.id("main"));

@@ -25,6 +25,8 @@ import com.npjt25.pissmod.network.PeeStatePayload;
 /** Client-side view of everyone who is currently peeing: plays their sounds and draws their streams. */
 public final class ClientStreams {
 	private static final Int2ObjectMap<Stream> STREAMS = new Int2ObjectOpenHashMap<>();
+	/** pee_start.ogg is 1.3 s long; start the loop a little before it ends so they crossfade. */
+	private static final int LOOP_DELAY_TICKS = 20;
 
 	private ClientStreams() {
 	}
@@ -36,14 +38,14 @@ public final class ClientStreams {
 		int color;
 		PeeLoopSound loop;
 
-		void startLoop(Minecraft client, LivingEntity entity) {
+		void startLoop(Minecraft client, LivingEntity entity, int delayTicks) {
 			if (this.loop != null && !this.loop.isStopped() && this.loop.entity() == entity) {
 				return;
 			}
 
 			stopLoop();
 			this.loop = new PeeLoopSound(entity, this.power);
-			client.getSoundManager().play(this.loop);
+			client.getSoundManager().playDelayed(this.loop, delayTicks);
 		}
 
 		void stopLoop() {
@@ -103,11 +105,13 @@ public final class ClientStreams {
 		switch (stream.phase) {
 			case UNZIPPING -> play(entity, ModSounds.UNZIP, 0.9F, 0.95F + entity.getRandom().nextFloat() * 0.1F);
 			case PEEING -> {
-				if (previous != PeePhase.FINISHING) {
+				if (previous == PeePhase.FINISHING) {
+					stream.startLoop(client, living, 0);
+				} else {
+					// The start sound ramps up into a full stream; the loop takes over near its end.
 					play(entity, ModSounds.PEE_START, streamVolume, streamPitch);
+					stream.startLoop(client, living, LOOP_DELAY_TICKS);
 				}
-
-				stream.startLoop(client, living);
 			}
 			case FINISHING -> {
 				stream.stopLoop();
@@ -147,7 +151,7 @@ public final class ClientStreams {
 			stream.phaseTicks++;
 
 			if (stream.phase == PeePhase.PEEING) {
-				stream.startLoop(client, living);
+				stream.startLoop(client, living, 0);
 				spawnStream(level, living, stream, stream.power, 1.0F, 1.0F);
 			} else if (stream.phase == PeePhase.FINISHING) {
 				// Taper off, then a few last dribbles.
@@ -184,6 +188,11 @@ public final class ClientStreams {
 
 	private static void play(Entity entity, SoundEvent sound, float volume, float pitch) {
 		Minecraft.getInstance().getSoundManager().play(new EntityBoundSoundInstance(sound, SoundSource.PLAYERS, volume, pitch, entity, entity.getRandom().nextLong()));
+	}
+
+	/** Number of players this client is currently showing a stream (or unzip/zip) for. */
+	public static int activeCount() {
+		return STREAMS.size();
 	}
 
 	public static void clear() {

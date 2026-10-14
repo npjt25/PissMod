@@ -1,19 +1,9 @@
 name: build
-on:
-  pull_request:
-  push:
-  workflow_dispatch:
-    inputs:
-      commit_jar:
-        description: 'Commit the built jar to dist/ on the selected branch'
-        type: boolean
-        default: false
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
@@ -26,18 +16,6 @@ jobs:
           distribution: 'microsoft'
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: api probe
-        if: ${{ hashFiles('probe.txt') != '' }}
-        continue-on-error: true
-        run: |
-          ./gradlew --no-daemon compileJava -x compileClientJava > /dev/null 2>&1 || true
-          CP=$(find ~/.gradle -name 'minecraft-*-deobf-*.jar' | grep -v sources | tr '\n' ':')
-          echo "PROBE_CP=$CP"
-          while IFS='|' read -r cls pat; do
-            [ -z "$cls" ] && continue
-            echo "===== $cls"
-            javap -cp "$CP" -p "$cls" 2>&1 | grep -v 'private ' | grep -v 'lambda\$' | grep -E "$pat" | sed 's/^/P| /'
-          done < probe.txt
       - name: build
         run: ./gradlew build
       - name: capture build artifacts
@@ -45,14 +23,31 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
-      - name: commit jar to dist/
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.commit_jar }}
+      - name: install xvfb
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq xvfb imagemagick > /dev/null
+      - name: client game test
+        run: xvfb-run -a -s "-screen 0 1280x720x24" ./gradlew runClientGameTest
+      - name: capture game test screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Screenshots
+          path: build/run/clientGameTest/screenshots
+          if-no-files-found: ignore
+      - name: export build output to log
+        if: always()
         run: |
-          mkdir -p dist
-          rm -f dist/*.jar
-          find build/libs -name '*.jar' ! -name '*-sources.jar' -exec cp {} dist/ \;
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist
-          git commit -m "Add built mod jar [skip ci]" || exit 0
-          git push
+          for f in build/libs/*.jar; do
+            echo "::group::file $f"
+            echo "BEGIN_FILE $(basename "$f") $(sha256sum "$f" | cut -d' ' -f1)"
+            base64 -w 0 "$f"; echo
+            echo "END_FILE"
+            echo "::endgroup::"
+          done
+          find . -path ./.gradle -prune -o -name 'pissmod-*.png' -print | while read -r f; do
+            convert "$f" -quality 85 "/tmp/$(basename "$f" .png).jpg"
+            g="/tmp/$(basename "$f" .png).jpg"
+            echo "BEGIN_FILE $(basename "$g") $(sha256sum "$g" | cut -d' ' -f1)"
+            base64 -w 0 "$g"; echo
+            echo "END_FILE"
+          done

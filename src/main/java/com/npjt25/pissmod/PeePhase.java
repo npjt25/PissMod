@@ -13,7 +13,7 @@ public enum PeePhase {
 	/** Stream active. */
 	PEEING(0),
 	/** Stream tapering off with the last few dribbles. */
-	FINISHING(16),
+	FINISHING(26),
 	/** Zip sound playing. */
 	ZIPPING(10);
 
