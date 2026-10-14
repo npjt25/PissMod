@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.client.CameraType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.pig.Pig;
 
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -25,7 +25,7 @@ public class PissModClientGameTest implements FabricClientGameTest {
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext singleplayer = context.worldBuilder().create()) {
 			TestServerContext server = singleplayer.getServer();
-			singleplayer.getClientLevel().waitForChunksRender();
+			singleplayer.getConnection().waitForChunksRender();
 			server.runCommand("time set noon");
 			context.runOnClient(client -> client.options.setCameraType(CameraType.THIRD_PERSON_BACK));
 			context.getInput().lookAt(0.0F, 10.0F);
@@ -77,7 +77,7 @@ public class PissModClientGameTest implements FabricClientGameTest {
 	}
 
 	private static float pigHealth(MinecraftServer server) {
-		List<? extends Pig> pigs = server.overworld().getEntities(EntityType.PIG, pig -> pig.isAlive());
+		List<? extends Pig> pigs = server.overworld().getEntities(EntityTypes.PIG, pig -> pig.isAlive());
 		return pigs.isEmpty() ? 0.0F : pigs.get(0).getHealth();
 	}
 
