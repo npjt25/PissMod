@@ -49,8 +49,8 @@ public class PissModClient implements ClientModInitializer {
 
 	private static void tick(Minecraft client) {
 		while (configKey.consumeClick()) {
-			if (client.screen == null) {
-				client.setScreen(new PissConfigScreen(null));
+			if (client.gui.screen() == null) {
+				client.gui.setScreen(new PissConfigScreen(null));
 			}
 		}
 

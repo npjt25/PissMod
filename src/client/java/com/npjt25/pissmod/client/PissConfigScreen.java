@@ -45,19 +45,23 @@ public class PissConfigScreen extends Screen {
 		super.extractRenderState(graphics, mouseX, mouseY, delta);
 		int centerX = this.width / 2;
 		int y = this.height / 4 + 10;
-		graphics.drawCenteredString(this.font, this.title, centerX, y - 20, 0xFFFFFFFF);
+		centeredText(graphics, this.title, centerX, y - 20);
 
 		PissConfig config = PissConfig.get();
 		Component hint = config.streamPower >= config.damageThreshold
 				? Component.translatable("screen.pissmod.hint.hurts").withStyle(ChatFormatting.RED)
 				: Component.translatable("screen.pissmod.hint.safe", config.damageThreshold).withStyle(ChatFormatting.GRAY);
-		graphics.drawCenteredString(this.font, hint, centerX, y + 28, 0xFFFFFFFF);
+		centeredText(graphics, hint, centerX, y + 28);
+	}
+
+	private void centeredText(GuiGraphicsExtractor graphics, Component text, int centerX, int y) {
+		graphics.text(this.font, text, centerX - this.font.width(text) / 2, y, 0xFFFFFFFF);
 	}
 
 	@Override
 	public void onClose() {
 		PissConfig.save();
-		this.minecraft.setScreen(this.parent);
+		this.minecraft.gui.setScreen(this.parent);
 	}
 
 	private static int colorIndex() {

@@ -49,19 +49,23 @@ public class PeeDropParticle extends SingleQuadParticle {
 
 	@Override
 	public void tick() {
-		double oldXd = this.xd;
-		double oldZd = this.zd;
+		// Where the droplet would end up this tick if nothing were in the way.
+		double expectedX = this.xd;
+		double expectedY = this.yd - 0.04 * this.gravity;
+		double expectedZ = this.zd;
 		super.tick();
 
 		if (!this.isAlive() || this.splash) {
 			return;
 		}
 
-		boolean hitWall = (oldXd != 0.0 && this.xd == 0.0) || (oldZd != 0.0 && this.zd == 0.0);
+		boolean blocked = Math.abs(this.x - this.xo - expectedX) > 1.0E-4
+				|| Math.abs(this.y - this.yo - expectedY) > 1.0E-4
+				|| Math.abs(this.z - this.zo - expectedZ) > 1.0E-4;
 
 		if (!this.level.getFluidState(BlockPos.containing(this.x, this.y, this.z)).isEmpty()) {
 			this.remove();
-		} else if (this.onGround || this.stoppedByCollision || hitWall) {
+		} else if (this.onGround || blocked) {
 			if (this.random.nextInt(3) == 0) {
 				ColorParticleOption options = ColorParticleOption.create(ModParticles.PEE_SPLASH, this.red, this.green, this.blue);
 				this.level.addParticle(options, this.x, this.y + 0.02, this.z,

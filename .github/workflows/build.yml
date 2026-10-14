@@ -1,9 +1,19 @@
 name: build
-on: [pull_request, push, workflow_dispatch]
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+    inputs:
+      commit_jar:
+        description: 'Commit the built jar to dist/ on the selected branch'
+        type: boolean
+        default: false
 
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
@@ -35,3 +45,14 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
+      - name: commit jar to dist/
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.commit_jar }}
+        run: |
+          mkdir -p dist
+          rm -f dist/*.jar
+          find build/libs -name '*.jar' ! -name '*-sources.jar' -exec cp {} dist/ \;
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist
+          git commit -m "Add built mod jar [skip ci]" || exit 0
+          git push
