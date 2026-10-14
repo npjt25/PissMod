@@ -18,6 +18,7 @@ import com.npjt25.pissmod.PissConfig;
 import com.npjt25.pissmod.client.ClientStreams;
 import com.npjt25.pissmod.client.PissModClient;
 import com.npjt25.pissmod.server.PeeManager;
+import com.npjt25.pissmod.server.StreamHits;
 
 @SuppressWarnings("UnstableApiUsage")
 public class PissModClientGameTest implements FabricClientGameTest {
@@ -49,7 +50,10 @@ public class PissModClientGameTest implements FabricClientGameTest {
 			assertPhase(server, PeePhase.IDLE);
 
 			// Below the damage threshold the stream hits but doesn't hurt; at 30 it does.
+			int hitsBefore = server.computeOnServer(s -> StreamHits.entityHits);
 			float healthAt25 = peeOnPig(context, server, 25, null);
+			int hitsAt25 = server.computeOnServer(s -> StreamHits.entityHits) - hitsBefore;
+			check(hitsAt25 > 0, "power 25 stream should hit the pig");
 			check(healthAt25 >= 10.0F, "power 25 should not hurt, pig health was " + healthAt25);
 			float healthAt30 = peeOnPig(context, server, 30, null);
 			check(healthAt30 < 10.0F, "power 30 should hurt, pig health was " + healthAt30);
@@ -57,10 +61,10 @@ public class PissModClientGameTest implements FabricClientGameTest {
 		}
 	}
 
-	/** Puts a pig 3 blocks in front of the player, pees on it, and returns its health afterwards (0 if it died). */
+	/** Puts a pig 3 blocks in front of the player (level with their feet), pees on it, and returns its health afterwards (0 if it died). */
 	private static float peeOnPig(ClientGameTestContext context, TestServerContext server, int power, String screenshot) {
 		server.runCommand("kill @e[type=minecraft:pig]");
-		server.runCommand("execute as @p at @s run summon minecraft:pig ^ ^ ^3 {NoAI:1b}");
+		server.runCommand("execute as @p at @s rotated ~ 0 run summon minecraft:pig ^ ^ ^3 {NoAI:1b}");
 		setPower(context, power);
 		context.waitTicks(5);
 		context.getInput().holdKey(PissModClient.peeKey());

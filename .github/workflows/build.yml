@@ -44,7 +44,7 @@ jobs:
             echo "END_FILE"
             echo "::endgroup::"
           done
-          find . -path ./.gradle -prune -o -name 'pissmod-*.png' -print | while read -r f; do
+          find . -path ./.gradle -prune -o -name '*pissmod-power-*.png' -print | while read -r f; do
             convert "$f" -quality 85 "/tmp/$(basename "$f" .png).jpg"
             g="/tmp/$(basename "$f" .png).jpg"
             echo "BEGIN_FILE $(basename "$g") $(sha256sum "$g" | cut -d' ' -f1)"

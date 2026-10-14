@@ -35,6 +35,8 @@ public final class StreamHits {
 	public static final ResourceKey<DamageType> PISS_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, PissMod.id("piss"));
 	/** The stream can't hit its owner until it has travelled this many ticks (so it can come back down on you). */
 	private static final int SELF_IMMUNE_STEPS = 10;
+	/** Total entities hit by any stream since startup (used by the game test). */
+	public static int entityHits;
 
 	private StreamHits() {
 	}
@@ -101,6 +103,7 @@ public final class StreamHits {
 	private static void onEntityHit(ServerLevel level, ServerPlayer shooter, EntityHit hit, Vec3 velocity, int power, int color) {
 		PissConfig config = PissConfig.get();
 		LivingEntity target = hit.entity();
+		entityHits++;
 
 		if (config.extinguishFire && target.isOnFire()) {
 			target.clearFire();
