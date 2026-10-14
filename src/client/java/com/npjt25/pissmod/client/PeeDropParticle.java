@@ -33,7 +33,7 @@ public class PeeDropParticle extends SingleQuadParticle {
 		this.friction = (float) StreamPhysics.DRAG;
 		this.hasPhysics = true;
 		this.lifetime = splash ? 5 + this.random.nextInt(6) : StreamPhysics.MAX_STEPS;
-		this.quadSize = splash ? 0.03F + this.random.nextFloat() * 0.02F : 0.05F + this.random.nextFloat() * 0.025F;
+		this.quadSize = splash ? 0.025F + this.random.nextFloat() * 0.015F : 0.035F + this.random.nextFloat() * 0.02F;
 		this.red = color.getRed();
 		this.green = color.getGreen();
 		this.blue = color.getBlue();

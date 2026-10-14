@@ -171,7 +171,7 @@ public final class ClientStreams {
 		RandomSource random = entity.getRandom();
 		float strength = StreamPhysics.strength(power);
 		double speed = StreamPhysics.speed(power) * speedScale;
-		int count = Math.max(1, Mth.ceil(speed / 0.1 * countScale));
+		int count = Math.max(1, Mth.ceil(speed / 0.06 * countScale));
 		double jitter = 0.006 + 0.01 * (1.0F - strength);
 		ColorParticleOption options = ColorParticleOption.create(ModParticles.PEE_DROP, 0xFF000000 | stream.color);
 
