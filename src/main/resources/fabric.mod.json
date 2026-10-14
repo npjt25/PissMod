@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "pissmod",
+	"version": "${version}",
+	"name": "PissMod",
+	"description": "Hold a key to unzip, pee from your crotch with a physics-based stream, and zip back up. Adjustable stream power from a gentle arc (0) to a firehose (50); at 30+ it hurts whoever you hit.",
+	"authors": [
+		"npjt25"
+	],
+	"contact": {
+		"sources": "https://github.com/npjt25/PissMod"
+	},
+	"license": "MIT",
+	"icon": "assets/pissmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.npjt25.pissmod.PissMod"
+		],
+		"client": [
+			"com.npjt25.pissmod.client.PissModClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

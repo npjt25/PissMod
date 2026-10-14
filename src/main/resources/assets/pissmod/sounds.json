@@ -1,0 +1,22 @@
+{
+	"unzip": {
+		"subtitle": "subtitles.pissmod.unzip",
+		"sounds": ["pissmod:unzip"]
+	},
+	"zip": {
+		"subtitle": "subtitles.pissmod.zip",
+		"sounds": ["pissmod:zip"]
+	},
+	"pee_start": {
+		"subtitle": "subtitles.pissmod.pee_start",
+		"sounds": ["pissmod:pee_start"]
+	},
+	"pee_loop": {
+		"subtitle": "subtitles.pissmod.pee_loop",
+		"sounds": ["pissmod:pee_loop"]
+	},
+	"pee_end": {
+		"subtitle": "subtitles.pissmod.pee_end",
+		"sounds": ["pissmod:pee_end"]
+	}
+}

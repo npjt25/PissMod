@@ -20,15 +20,13 @@ jobs:
         if: ${{ hashFiles('probe.txt') != '' }}
         continue-on-error: true
         run: |
-          ./gradlew --no-daemon dependencies --configuration compileClasspath > /dev/null || true
           ./gradlew --no-daemon compileJava -x compileClientJava > /dev/null 2>&1 || true
-          JAR=$(find ~/.gradle .gradle -name '*.jar' 2>/dev/null | grep -i 'minecraft' | grep -iv 'sources' | xargs ls -S 2>/dev/null | head -1)
-          echo "PROBE_JAR=$JAR"
-          find ~/.gradle .gradle -name '*.jar' 2>/dev/null | grep -i minecraft | head -20
-          while read -r cls; do
+          CP=$(find ~/.gradle -name 'minecraft-*-deobf-*.jar' | grep -v sources | tr '\n' ':')
+          echo "PROBE_CP=$CP"
+          while IFS='|' read -r cls pat; do
             [ -z "$cls" ] && continue
             echo "===== $cls"
-            javap -cp "$JAR" -p "$cls" 2>&1 | grep -v 'private static final' | grep -v 'lambda\$'
+            javap -cp "$CP" -p "$cls" 2>&1 | grep -v 'private ' | grep -v 'lambda\$' | grep -E "$pat" | sed 's/^/P| /'
           done < probe.txt
       - name: build
         run: ./gradlew build

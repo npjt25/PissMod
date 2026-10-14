@@ -1,0 +1,35 @@
+{
+	"key.category.pissmod.main": "PissMod",
+	"key.pissmod.pee": "Pee (hold)",
+	"key.pissmod.config": "PissMod Settings",
+
+	"subtitles.pissmod.unzip": "Pants unzip",
+	"subtitles.pissmod.zip": "Pants zip up",
+	"subtitles.pissmod.pee_start": "Stream starts",
+	"subtitles.pissmod.pee_loop": "Someone pees",
+	"subtitles.pissmod.pee_end": "Stream dribbles out",
+
+	"death.attack.pissmod.piss": "%1$s was hosed down by %2$s",
+	"death.attack.pissmod.piss.player": "%1$s was hosed down whilst fighting %2$s",
+	"death.attack.pissmod.piss.item": "%1$s was hosed down by %2$s using %3$s",
+
+	"screen.pissmod.title": "PissMod Settings",
+	"screen.pissmod.power": "Stream Power: %s (%s)",
+	"screen.pissmod.power.normal": "Normal",
+	"screen.pissmod.power.strong": "Strong",
+	"screen.pissmod.power.painful": "Painful",
+	"screen.pissmod.power.firehose": "FIREHOSE",
+	"screen.pissmod.hint.safe": "Harmless. Starts hurting people at %s",
+	"screen.pissmod.hint.hurts": "This will hurt whoever you hit!",
+	"screen.pissmod.color": "Color: %s",
+	"screen.pissmod.color.yellow": "Yellow",
+	"screen.pissmod.color.pale": "Pale (hydrated)",
+	"screen.pissmod.color.dark": "Dark (drink water)",
+	"screen.pissmod.color.clear": "Clear",
+	"screen.pissmod.color.green": "Green",
+	"screen.pissmod.color.red": "Red",
+	"screen.pissmod.color.blue": "Blue",
+	"screen.pissmod.color.purple": "Purple",
+
+	"message.pissmod.server_missing": "PissMod isn't installed on this server"
+}
