@@ -28,7 +28,7 @@ public class PissModClientGameTest implements FabricClientGameTest {
 			TestServerContext server = singleplayer.getServer();
 			singleplayer.getConnection().waitForChunksRender();
 			server.runCommand("time set noon");
-			context.runOnClient(client -> client.options.setCameraType(CameraType.THIRD_PERSON_BACK));
+			setCamera(context, CameraType.THIRD_PERSON_BACK);
 			context.getInput().lookAt(0.0F, 10.0F);
 			context.waitTicks(10);
 
@@ -42,7 +42,10 @@ public class PissModClientGameTest implements FabricClientGameTest {
 			context.waitTicks(25);
 			int streams = context.computeOnClient(client -> ClientStreams.activeCount());
 			check(streams == 1, "client should be showing 1 stream, was " + streams);
-			context.takeScreenshot("pissmod-power-0");
+			screenshotStream(context, CameraType.FIRST_PERSON, 40.0F, "pissmod-first-person-power-0");
+			screenshotStream(context, CameraType.THIRD_PERSON_FRONT, 10.0F, "pissmod-front-power-0");
+			setCamera(context, CameraType.THIRD_PERSON_BACK);
+			context.getInput().lookAt(0.0F, 10.0F);
 			context.getInput().releaseKey(PissModClient.peeKey());
 			context.waitTicks(4);
 			assertPhase(server, PeePhase.FINISHING);
@@ -51,30 +54,46 @@ public class PissModClientGameTest implements FabricClientGameTest {
 
 			// Below the damage threshold the stream hits but doesn't hurt; at 30 it does.
 			int hitsBefore = server.computeOnServer(s -> StreamHits.entityHits);
-			float healthAt25 = peeOnPig(context, server, 25, null);
+			float healthAt25 = peeOnPig(context, server, 25);
 			int hitsAt25 = server.computeOnServer(s -> StreamHits.entityHits) - hitsBefore;
 			check(hitsAt25 > 0, "power 25 stream should hit the pig");
 			check(healthAt25 >= 10.0F, "power 25 should not hurt, pig health was " + healthAt25);
-			float healthAt30 = peeOnPig(context, server, 30, null);
+			float healthAt30 = peeOnPig(context, server, 30);
 			check(healthAt30 < 10.0F, "power 30 should hurt, pig health was " + healthAt30);
-			peeOnPig(context, server, 50, "pissmod-power-50");
+			peeOnPig(context, server, 50);
+
+			// Firehose, seen from the front.
+			server.runCommand("kill @e[type=minecraft:pig]");
+			setPower(context, 50);
+			context.getInput().holdKey(PissModClient.peeKey());
+			context.waitTicks(20);
+			screenshotStream(context, CameraType.THIRD_PERSON_FRONT, 0.0F, "pissmod-front-power-50");
+			screenshotStream(context, CameraType.FIRST_PERSON, 0.0F, "pissmod-first-person-power-50");
+			context.getInput().releaseKey(PissModClient.peeKey());
+			context.waitTicks(45);
+			assertPhase(server, PeePhase.IDLE);
 		}
 	}
 
 	/** Puts a pig 3 blocks in front of the player (level with their feet), pees on it, and returns its health afterwards (0 if it died). */
-	private static float peeOnPig(ClientGameTestContext context, TestServerContext server, int power, String screenshot) {
+	private static void setCamera(ClientGameTestContext context, CameraType camera) {
+		context.runOnClient(client -> client.options.setCameraType(camera));
+	}
+
+	private static void screenshotStream(ClientGameTestContext context, CameraType camera, float pitch, String name) {
+		setCamera(context, camera);
+		context.getInput().lookAt(0.0F, pitch);
+		context.waitTicks(25);
+		context.takeScreenshot(name);
+	}
+
+	private static float peeOnPig(ClientGameTestContext context, TestServerContext server, int power) {
 		server.runCommand("kill @e[type=minecraft:pig]");
 		server.runCommand("execute as @p at @s rotated ~ 0 run summon minecraft:pig ^ ^ ^3 {NoAI:1b}");
 		setPower(context, power);
 		context.waitTicks(5);
 		context.getInput().holdKey(PissModClient.peeKey());
-		context.waitTicks(40);
-
-		if (screenshot != null) {
-			context.takeScreenshot(screenshot);
-		}
-
-		context.waitTicks(20);
+		context.waitTicks(60);
 		context.getInput().releaseKey(PissModClient.peeKey());
 		context.waitTicks(45);
 		return server.computeOnServer(PissModClientGameTest::pigHealth);
